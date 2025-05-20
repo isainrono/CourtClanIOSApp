@@ -1,0 +1,11 @@
+//
+//  Localizable.strings
+//  CourtClan
+//
+//  Created by Isain Rodriguez Noreña on 20/5/25.
+//
+"app_name" = "CourtClan";
+"welcome_title" = "Welcome";
+"greeting_message" = "Hello, %@!";
+"button_title" = "Continue";
+
