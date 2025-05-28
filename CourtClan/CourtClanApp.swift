@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct CourtClanApp: App {
+    
+    @StateObject private var appData = AppData()
+    @StateObject private var appUtils = AppUtils()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appData)
+                .environmentObject(appUtils)
         }
     }
 }

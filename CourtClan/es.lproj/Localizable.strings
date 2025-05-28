@@ -6,5 +6,5 @@
 //
 "app_name" = "CourtClan";
 "welcome_title" = "Bienvenido";
-"greeting_message" = "¡Hola, %@!";
+"greeting_message" = "Ingresa tus datos para continuar!";
 "button_title" = "Continuar";
