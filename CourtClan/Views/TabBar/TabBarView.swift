@@ -18,16 +18,20 @@ struct TabBarView: View {
         TabView (selection: $tabSelection){
             
             HomeView()
-                .environmentObject(AppData())
+                .environmentObject(appData)
                 .tag(1)
             
             TeamsView().tag(2)
+                .environmentObject(appData)
             
             HighLightsView().tag(3)
+                .environmentObject(appData)
             
             CourtsView().tag(4)
+                .environmentObject(appData)
             
             PlayersView().tag(5)
+                .environmentObject(appData)
             
             
         }

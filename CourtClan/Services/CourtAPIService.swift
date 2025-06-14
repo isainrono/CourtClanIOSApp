@@ -13,24 +13,59 @@ enum APIError: Error, LocalizedError {
     case invalidResponse
     case decodingError(Error)
     case apiError(String, Int) // mensaje de error de la API y código de estado
+    case unauthorized // Para código de estado 401
+    case notFound // Para código de estado 404 (recurso no encontrado)
+    case requestFailed(Int) // Para otros códigos de estado de error genéricos (ej. 400, 500)
     case unknown(Error)
 
     var errorDescription: String? {
+        // ... (your errorDescription implementation) ...
         switch self {
         case .invalidURL:
-            return "La URL de la API es inválida."
+            return "La URL de la API es inválida. Por favor, verifica la configuración."
         case .invalidResponse:
             return "Respuesta inválida del servidor."
         case .decodingError(let error):
             return "Error al decodificar los datos: \(error.localizedDescription)"
         case .apiError(let message, let statusCode):
             return "Error de la API (\(statusCode)): \(message)"
+        case .unauthorized:
+            return "No autorizado. Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo."
+        case .notFound:
+            return "El recurso solicitado no fue encontrado."
+        case .requestFailed(let statusCode):
+            return "La solicitud al servidor falló con el código de estado: \(statusCode). Por favor, inténtalo de nuevo."
         case .unknown(let error):
-            return "Ocurrió un error desconocido: \(error.localizedDescription)"
+            return "Ocurrió un error inesperado: \(error.localizedDescription)"
         }
+    }
+
+    // Un initializer para convertir HTTPURLResponse en un APIError
+    static func from(httpResponse: HTTPURLResponse, data: Data?) -> APIError? {
+        if !(200...299).contains(httpResponse.statusCode) {
+            let decoder = JSONDecoder()
+            // Intenta decodificar un mensaje de error si está disponible en la respuesta de la API
+            if let responseData = data, let apiErrorResponse = try? decoder.decode(APIErrorMessage.self, from: responseData) {
+                return .apiError(apiErrorResponse.message, httpResponse.statusCode)
+            } else {
+                // Si no hay un mensaje de error específico de la API, usa los casos genéricos
+                switch httpResponse.statusCode {
+                case 401: return .unauthorized
+                case 404: return .notFound
+                default: return .requestFailed(httpResponse.statusCode)
+                }
+            }
+        }
+        return nil
     }
 }
 
+// Define APIErrorMessage at the top level of the file, or at least outside of `PlayerAPIService`
+// but in the same file where APIError is defined.
+// Using 'fileprivate' makes it accessible within this file but not outside it.
+fileprivate struct APIErrorMessage: Decodable {
+    let message: String
+}
 // MARK: - Contratos para el Servicio
 protocol CourtService {
     func fetchAllCourts() async throws -> [Court]

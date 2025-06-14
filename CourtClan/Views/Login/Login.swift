@@ -6,46 +6,70 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseAuth
+import GoogleSignIn
+import GoogleSignInSwift
 
 
 struct Login: View {
-    
+
     @EnvironmentObject var appData: AppData
     @EnvironmentObject var appUtils: AppUtils
-    
+
+    // ¡CAMBIO CLAVE AQUÍ!
+    // En lugar de @StateObject, usa @EnvironmentObject para obtener la instancia ya configurada
+    @EnvironmentObject var authenticationVM: AuthenticationView // Renombrado a authenticationVM para mayor claridad
+
     @State private var emailID: String = ""
     @State private var password: String = ""
     @State private var isEmailValid: Bool = true
     @State private var isPasswordVisible: Bool = false
-    let placeholderColor = Color(.gray) // Define el color del placeholder
+    let placeholderColor = Color(.gray)
     var onLoginSuccess: () -> Void
-    
+    @State private var loginError = ""
+
+
     var body: some View {
         NavigationView {
-            // Asegúrate de que Login esté dentro de un NavigationView
             content
         }
-        .navigationViewStyle(StackNavigationViewStyle()) // Recomendado para consistencia
+        .navigationViewStyle(StackNavigationViewStyle())
+        // Observa los cambios en isSignSuccessed de AuthenticationView (ahora authenticationVM)
+        .onChange(of: authenticationVM.isSignSuccessed) { success in // Usa authenticationVM
+            if success {
+                onLoginSuccess() // Si es exitoso, llama a la acción de éxito
+                loginError = "" // Limpia cualquier error de login anterior
+            }
+        }
+        // Observa los cambios en authenticationError de AuthenticationView (ahora authenticationVM)
+        .onChange(of: authenticationVM.authenticationError) { errorMessage in // Usa authenticationVM
+            if let errorMessage = errorMessage {
+                self.loginError = errorMessage // Muestra el error de autenticación de Google/Firebase
+            } else {
+                self.loginError = "" // Limpia el error si no hay ninguno
+            }
+        }
     }
-    
+
+
     var content: some View {
         VStack {
-            Spacer() // Pushes content towards the center vertically
-            
+            Spacer()
+
             VStack(alignment: .leading, spacing: 20) {
-                
-                    
+
                 Text(LocalizedStringResource("app_name", comment: "Login title"))
                     .font(.custom("Chalkboard SE", size: 40))
                     .fontWeight(.heavy)
                     .foregroundColor(.ccSecondary)
-                
+
                 Text(LocalizedStringResource("greeting_message", comment: "Login title"))
                     .font(.callout)
                     .fontWeight(.semibold)
                     .foregroundStyle(.gray)
                     .padding(.top, -5)
-                
+
                 VStack(spacing: 15) {
                     HStack {
                         Image(systemName: "at")
@@ -56,7 +80,6 @@ struct Login: View {
                             .placeholder(when: emailID.isEmpty) {
                                 Text("Email").foregroundColor(placeholderColor)
                             }
-                            
                     }
                     .padding(.horizontal)
                     .frame(height: 45)
@@ -71,7 +94,7 @@ struct Login: View {
                             .font(.caption)
                             .foregroundColor(.red)
                     }
-                    
+
                     HStack {
                         Image(systemName: "lock.fill")
                             .foregroundColor(placeholderColor)
@@ -87,8 +110,8 @@ struct Login: View {
                         .placeholder(when: password.isEmpty) {
                             Text("Contraseña").foregroundColor(placeholderColor)
                         }
-                        .padding(.leading, 5) // Ajusta el espacio después del icono
-                        
+                        .padding(.leading, 5)
+
                         Button {
                             isPasswordVisible.toggle()
                         } label: {
@@ -102,11 +125,10 @@ struct Login: View {
                     .background(Color(.secondarySystemBackground))
                     .cornerRadius(10)
                     .opacity(0.8)
-                    
+
                     HStack {
                         Spacer()
                         Button {
-                            // TODO: Implement forgot password functionality
                             print("Forgot Password Tapped")
                         } label: {
                             Text("¿Olvidaste tu contraseña?")
@@ -115,13 +137,14 @@ struct Login: View {
                         }
                     }
                 }
-                
+
                 VStack(spacing: 15) {
                     Button {
-                        // Lógica de inicio de sesión aquí
+                        // Lógica de inicio de sesión aquí (para email/contraseña)
                         print("Iniciar Sesión Tapped")
                         // Si el inicio de sesión es exitoso, llama al completion handler
-                        onLoginSuccess()
+                        // Esto es para el login tradicional, no para Google.
+                         onLoginSuccess()
                     } label: {
                         Text("Iniciar Sesión")
                             .fontWeight(.semibold)
@@ -131,12 +154,12 @@ struct Login: View {
                             .background(.ccSecondary)
                             .cornerRadius(10)
                     }
-                    
-                    
+
+
                     HStack(spacing: 15) {
                         Button {
-                            // TODO: Implement Google login functionality
-                            print("Login with Google Tapped")
+                            // Llama a signInWithGoogle usando la instancia inyectada
+                            authenticationVM.signInWithGoogle() // Usa authenticationVM
                         } label: {
                             HStack {
                                 Image("google_logo") // Asegúrate de tener esta imagen en tus assets
@@ -152,10 +175,10 @@ struct Login: View {
                             .background(Color(.systemGray6))
                             .cornerRadius(10)
                         }
-                        
+
                         Button {
-                            // TODO: Implement iOS login functionality (e.g., Sign in with Apple)
                             print("Login with iOS Tapped")
+                            // TODO: Implementar Sign In with Apple aquí
                         } label: {
                             HStack {
                                 Image(systemName: "apple.logo")
@@ -172,30 +195,37 @@ struct Login: View {
                             .cornerRadius(10)
                         }
                     }
+
+                    // Muestra el mensaje de error si existe
+                    if !loginError.isEmpty {
+                        Text(loginError)
+                            .foregroundColor(.red)
+                            .font(.footnote)
+                            .padding(.top, 5)
+                            .multilineTextAlignment(.center)
+                    }
                 }
             }
             .padding()
             .frame(maxWidth: .infinity)
-            
-            Spacer() // Pushes content towards the center vertically
-            
+
+            Spacer()
+
             VStack(spacing: 10) {
                 HStack(spacing: 10) {
                     Button {
-                        // TODO: Implement Privacy Policy navigation
                         print("Privacy Policy Tapped")
                     } label: {
                         Text("Política de privacidad")
                             .font(.footnote)
                             .foregroundColor(.gray)
                     }
-                    
+
                     Text("·")
                         .font(.footnote)
                         .foregroundColor(.gray)
-                    
+
                     Button {
-                        // TODO: Implement Terms and Conditions navigation
                         print("Términos y condiciones Tapped")
                     } label: {
                         Text("Términos y condiciones")
@@ -203,14 +233,13 @@ struct Login: View {
                             .foregroundColor(.gray)
                     }
                 }
-                
+
                 HStack {
                     Text("¿No tienes una cuenta?")
                         .font(.footnote)
                         .foregroundColor(.gray)
-                    
+
                     Button {
-                        // TODO: Implement registration navigation
                         print("Register Tapped")
                     } label: {
                         Text("Regístrate")
@@ -220,26 +249,19 @@ struct Login: View {
                     }
                 }
             }
-            .padding(.bottom) // Adds some padding at the very bottom
+            .padding(.bottom)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center) // Center the entire content
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .background(
             ZStack {
-              /*Circle()
-               .fill(Color.mint)
-               .scaleEffect(1.5) // Ajusta el tamaño
-               .offset(x: 0, y: 0) // Ajusta la posición*/
-
-              Image("fondo") // Reemplaza "nombreDeTuImagen" con el nombre de tu imagen en Assets.xcassets
-               .resizable()
-               .scaledToFit()
-               .frame(width: 1250, height: 1250) // Ajusta el tamaño de la imagen dentro del círculo
-               //.clipShape(Circle()) // Recorta la imagen a la forma del círculo
-               .opacity(0.4)
-               .background(Color.black)
-             }
-             .ignoresSafeArea()
-            
+                Image("fondo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 1250, height: 1250)
+                    .opacity(0.4)
+                    .background(Color.black)
+            }
+            .ignoresSafeArea()
         )
         .navigationBarHidden(true)
     }
@@ -251,7 +273,7 @@ extension View {
         when shouldShow: Bool,
         alignment: Alignment = .leading,
         @ViewBuilder placeholder: () -> Content) -> some View {
-            
+
             ZStack(alignment: alignment) {
                 placeholder().opacity(shouldShow ? 1 : 0)
                 self
@@ -260,7 +282,11 @@ extension View {
 }
 
 #Preview {
+    // Para el preview, también necesitas inyectar los EnvironmentObjects
     Login(onLoginSuccess: {})
         .environmentObject(AppUtils())
         .environmentObject(AppData())
+        // ¡Importante para el preview también!
+        .environmentObject(AuthenticationView()) // Aquí no tiene PlayersViewModel inyectado
+        .environmentObject(PlayersViewModel()) // Tendrías que mockearlo o inicializarlo
 }

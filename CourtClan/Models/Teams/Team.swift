@@ -47,6 +47,18 @@ struct Team: Identifiable, Codable {
         self.updatedAt = updatedAt
     }
     
+    init () {
+        self.id = ""
+        self.name = ""
+        self.description = nil
+        self.logoUrl = nil
+        self.ownerUserId = ""
+        self.captainUserId = nil
+        self.teamFunds = 0
+        self.createdAt = nil
+        self.updatedAt = nil
+    }
+    
     // MARK: - Custom Decoder para manejar team_funds como String y el mapeo explícito
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

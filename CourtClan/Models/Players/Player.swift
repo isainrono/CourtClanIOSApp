@@ -13,16 +13,16 @@ struct Player: Identifiable, Codable {
     let email: String
     let fullName: String? // full_name
     let bio: String?
-    
-    // Private property to hold the raw URL string from JSON (with extra quotes)
+
+    // Private property to hold the raw URL string from JSON (con comillas extra)
     private let _profilePictureUrl: String?
-    
+
     // Public computed property to provide the cleaned URL string
     var profilePictureUrl: String? {
-        // Remove leading and trailing double quotes if they exist
+        // Eliminar comillas dobles iniciales y finales si existen
         _profilePictureUrl?.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
     }
-    
+
     let location: String?
     let dateOfBirth: Date? // date_of_birth
     let gender: String?
@@ -32,7 +32,7 @@ struct Player: Identifiable, Codable {
     let totalXp: Int // total_xp
     let gamesPlayed: Int // games_played
     let gamesWon: Int // games_won
-    let winPercentage: Double // win_percentage
+    let winPercentage: Double // win_percentage  <-- La propiedad sigue siendo Double
     let avgPointsPerGame: Double // avg_points_per_game
     let avgAssistsPerGame: Double // avg_assists_per_game
     let avgReboundsPerGame: Double // avg_rebounds_per_game
@@ -82,11 +82,10 @@ struct Player: Identifiable, Codable {
         case updatedAt = "updated_at"
         case team
     }
+    
 
     // MARK: - Custom Memberwise Initializer for programmatic creation (like Previews)
-    // When creating a player manually, pass the clean URL here.
-    // It will be stored in _profilePictureUrl and then cleaned again by the computed property.
-    // This redundancy is fine for convenience in previews.
+    // (Mantén este inicializador como está, ya que se usa para crear instancias en el código)
     init(id: String, username: String, email: String, fullName: String?, bio: String?, profilePictureUrl: String?, location: String?, dateOfBirth: Date?, gender: String?, preferredPosition: String?, skillLevelId: String?, currentLevel: Int, totalXp: Int, gamesPlayed: Int, gamesWon: Int, winPercentage: Double, avgPointsPerGame: Double, avgAssistsPerGame: Double, avgReboundsPerGame: Double, avgBlocksPerGame: Double, avgStealsPerGame: Double, isPublic: Bool, isActive: Bool, currentTeamId: String?, marketValue: Double, isFreeAgent: Bool, lastLogin: Date?, createdAt: Date?, updatedAt: Date?, team: Team?) {
         self.id = id
         self.username = username
@@ -129,10 +128,9 @@ struct Player: Identifiable, Codable {
         email = try container.decode(String.self, forKey: .email)
         fullName = try container.decodeIfPresent(String.self, forKey: .fullName)
         bio = try container.decodeIfPresent(String.self, forKey: .bio)
-        
-        // Decode the raw string into _profilePictureUrl
+
         _profilePictureUrl = try container.decodeIfPresent(String.self, forKey: ._profilePictureUrl)
-        
+
         location = try container.decodeIfPresent(String.self, forKey: .location)
         dateOfBirth = try container.decodeIfPresent(Date.self, forKey: .dateOfBirth)
         gender = try container.decodeIfPresent(String.self, forKey: .gender)
@@ -143,67 +141,88 @@ struct Player: Identifiable, Codable {
         gamesPlayed = try container.decode(Int.self, forKey: .gamesPlayed)
         gamesWon = try container.decode(Int.self, forKey: .gamesWon)
 
-        // --- INICIO: Decodificación manual para Double que viene como String ---
-        let winPercentageString = try container.decode(String.self, forKey: .winPercentage)
-        guard let winPercentageDouble = Double(winPercentageString) else {
-            throw DecodingError.dataCorruptedError(forKey: .winPercentage,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert win_percentage string \"\(winPercentageString)\" to Double")
+        // --- CORRECCIÓN AQUÍ: INTENTA DECODIFICAR COMO DOUBLE, SI FALLA, INTENTA COMO STRING Y CONVIERTE ---
+        do {
+            winPercentage = try container.decode(Double.self, forKey: .winPercentage)
+        } catch DecodingError.typeMismatch {
+            // Si es un String, decodifica como String y luego convierte
+            let winPercentageString = try container.decode(String.self, forKey: .winPercentage)
+            guard let doubleValue = Double(winPercentageString) else {
+                throw DecodingError.dataCorruptedError(forKey: .winPercentage,
+                                                       in: container,
+                                                       debugDescription: "Cannot convert String \"\(winPercentageString)\" to Double for winPercentage.")
+            }
+            winPercentage = doubleValue
         }
-        winPercentage = winPercentageDouble
+        
+        do {
+            avgPointsPerGame = try container.decode(Double.self, forKey: .avgPointsPerGame)
+        } catch DecodingError.typeMismatch {
+            let avgPointsPerGameString = try container.decode(String.self, forKey: .avgPointsPerGame)
+            guard let doubleValue = Double(avgPointsPerGameString) else {
+                throw DecodingError.dataCorruptedError(forKey: .avgPointsPerGame, in: container, debugDescription: "Cannot convert String \"\(avgPointsPerGameString)\" to Double for avgPointsPerGame.")
+            }
+            avgPointsPerGame = doubleValue
+        }
 
-        let avgPointsPerGameString = try container.decode(String.self, forKey: .avgPointsPerGame)
-        guard let avgPointsPerGameDouble = Double(avgPointsPerGameString) else {
-            throw DecodingError.dataCorruptedError(forKey: .avgPointsPerGame,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert avg_points_per_game string \"\(avgPointsPerGameString)\" to Double")
+        do {
+            avgAssistsPerGame = try container.decode(Double.self, forKey: .avgAssistsPerGame)
+        } catch DecodingError.typeMismatch {
+            let avgAssistsPerGameString = try container.decode(String.self, forKey: .avgAssistsPerGame)
+            guard let doubleValue = Double(avgAssistsPerGameString) else {
+                throw DecodingError.dataCorruptedError(forKey: .avgAssistsPerGame, in: container, debugDescription: "Cannot convert String \"\(avgAssistsPerGameString)\" to Double for avgAssistsPerGame.")
+            }
+            avgAssistsPerGame = doubleValue
         }
-        avgPointsPerGame = avgPointsPerGameDouble
 
-        let avgAssistsPerGameString = try container.decode(String.self, forKey: .avgAssistsPerGame)
-        guard let avgAssistsPerGameDouble = Double(avgAssistsPerGameString) else {
-            throw DecodingError.dataCorruptedError(forKey: .avgAssistsPerGame,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert avg_assists_per_game string \"\(avgAssistsPerGameString)\" to Double")
+        do {
+            avgReboundsPerGame = try container.decode(Double.self, forKey: .avgReboundsPerGame)
+        } catch DecodingError.typeMismatch {
+            let avgReboundsPerGameString = try container.decode(String.self, forKey: .avgReboundsPerGame)
+            guard let doubleValue = Double(avgReboundsPerGameString) else {
+                throw DecodingError.dataCorruptedError(forKey: .avgReboundsPerGame, in: container, debugDescription: "Cannot convert String \"\(avgReboundsPerGameString)\" to Double for avgReboundsPerGame.")
+            }
+            avgReboundsPerGame = doubleValue
         }
-        avgAssistsPerGame = avgAssistsPerGameDouble
 
-        let avgReboundsPerGameString = try container.decode(String.self, forKey: .avgReboundsPerGame)
-        guard let avgReboundsPerGameDouble = Double(avgReboundsPerGameString) else {
-            throw DecodingError.dataCorruptedError(forKey: .avgReboundsPerGame,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert avg_rebounds_per_game string \"\(avgReboundsPerGameString)\" to Double")
+        do {
+            avgBlocksPerGame = try container.decode(Double.self, forKey: .avgBlocksPerGame)
+        } catch DecodingError.typeMismatch {
+            let avgBlocksPerGameString = try container.decode(String.self, forKey: .avgBlocksPerGame)
+            guard let doubleValue = Double(avgBlocksPerGameString) else {
+                throw DecodingError.dataCorruptedError(forKey: .avgBlocksPerGame, in: container, debugDescription: "Cannot convert String \"\(avgBlocksPerGameString)\" to Double for avgBlocksPerGame.")
+            }
+            avgBlocksPerGame = doubleValue
         }
-        avgReboundsPerGame = avgReboundsPerGameDouble
 
-        let avgBlocksPerGameString = try container.decode(String.self, forKey: .avgBlocksPerGame)
-        guard let avgBlocksPerGameDouble = Double(avgBlocksPerGameString) else {
-            throw DecodingError.dataCorruptedError(forKey: .avgBlocksPerGame,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert avg_blocks_per_game string \"\(avgBlocksPerGameString)\" to Double")
+        do {
+            avgStealsPerGame = try container.decode(Double.self, forKey: .avgStealsPerGame)
+        } catch DecodingError.typeMismatch {
+            let avgStealsPerGameString = try container.decode(String.self, forKey: .avgStealsPerGame)
+            guard let doubleValue = Double(avgStealsPerGameString) else {
+                throw DecodingError.dataCorruptedError(forKey: .avgStealsPerGame, in: container, debugDescription: "Cannot convert String \"\(avgStealsPerGameString)\" to Double for avgStealsPerGame.")
+            }
+            avgStealsPerGame = doubleValue
         }
-        avgBlocksPerGame = avgBlocksPerGameDouble
-
-        let avgStealsPerGameString = try container.decode(String.self, forKey: .avgStealsPerGame)
-        guard let avgStealsPerGameDouble = Double(avgStealsPerGameString) else {
-            throw DecodingError.dataCorruptedError(forKey: .avgStealsPerGame,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert avg_steals_per_game string \"\(avgStealsPerGameString)\" to Double")
-        }
-        avgStealsPerGame = avgStealsPerGameDouble
+        // --- FIN CORRECCIÓN ---
 
         isPublic = try container.decode(Bool.self, forKey: .isPublic)
         isActive = try container.decode(Bool.self, forKey: .isActive)
         currentTeamId = try container.decodeIfPresent(String.self, forKey: .currentTeamId)
 
-        let marketValueString = try container.decode(String.self, forKey: .marketValue)
-        guard let marketValueDouble = Double(marketValueString) else {
-            throw DecodingError.dataCorruptedError(forKey: .marketValue,
-                                                  in: container,
-                                                  debugDescription: "Cannot convert market_value string \"\(marketValueString)\" to Double")
+        // --- CORRECCIÓN AQUÍ: DECODIFICAR marketValue también de la misma manera ---
+        do {
+            marketValue = try container.decode(Double.self, forKey: .marketValue)
+        } catch DecodingError.typeMismatch {
+            let marketValueString = try container.decode(String.self, forKey: .marketValue)
+            guard let doubleValue = Double(marketValueString) else {
+                throw DecodingError.dataCorruptedError(forKey: .marketValue,
+                                                       in: container,
+                                                       debugDescription: "Cannot convert String \"\(marketValueString)\" to Double for marketValue.")
+            }
+            marketValue = doubleValue
         }
-        marketValue = marketValueDouble
-        // --- FIN: Decodificación manual ---
+        // --- FIN CORRECCIÓN ---
 
         isFreeAgent = try container.decode(Bool.self, forKey: .isFreeAgent)
         lastLogin = try container.decodeIfPresent(Date.self, forKey: .lastLogin)
@@ -222,11 +241,11 @@ struct Player: Identifiable, Codable {
         try container.encode(email, forKey: .email)
         try container.encodeIfPresent(fullName, forKey: .fullName)
         try container.encodeIfPresent(bio, forKey: .bio)
-        
-        // When encoding, use the cleaned URL string.
-        // If your API expects the extra quotes on sending, you'd need to add them back here.
-        // For now, sending the clean URL string is generally what's expected.
-        try container.encodeIfPresent(profilePictureUrl, forKey: ._profilePictureUrl) // Use the public computed property
+
+        // Cuando codificas, usa la URL limpia.
+        // Si tu API espera las comillas extras al enviar, necesitarías agregarlas aquí.
+        // Por ahora, enviar la cadena de URL limpia es generalmente lo esperado.
+        try container.encodeIfPresent(profilePictureUrl, forKey: ._profilePictureUrl) // Usa la propiedad computada pública
 
         try container.encodeIfPresent(location, forKey: .location)
         try container.encodeIfPresent(dateOfBirth, forKey: .dateOfBirth)
@@ -237,27 +256,27 @@ struct Player: Identifiable, Codable {
         try container.encode(totalXp, forKey: .totalXp)
         try container.encode(gamesPlayed, forKey: .gamesPlayed)
         try container.encode(gamesWon, forKey: .gamesWon)
-        
-        // Encode Double as String (matches decode logic)
-        try container.encode(String(format: "%.2f", winPercentage), forKey: .winPercentage)
-        try container.encode(String(format: "%.2f", avgPointsPerGame), forKey: .avgPointsPerGame)
-        try container.encode(String(format: "%.2f", avgAssistsPerGame), forKey: .avgAssistsPerGame)
-        try container.encode(String(format: "%.2f", avgReboundsPerGame), forKey: .avgReboundsPerGame)
-        try container.encode(String(format: "%.2f", avgBlocksPerGame), forKey: .avgBlocksPerGame)
-        try container.encode(String(format: "%.2f", avgStealsPerGame), forKey: .avgStealsPerGame)
-        
+
+        // Codifica Double como Double, a menos que tu API *realmente* espere un String al enviar.
+        // Lo más común es enviar números como números.
+        try container.encode(winPercentage, forKey: .winPercentage)
+        try container.encode(avgPointsPerGame, forKey: .avgPointsPerGame)
+        try container.encode(avgAssistsPerGame, forKey: .avgAssistsPerGame)
+        try container.encode(avgReboundsPerGame, forKey: .avgReboundsPerGame)
+        try container.encode(avgBlocksPerGame, forKey: .avgBlocksPerGame)
+        try container.encode(avgStealsPerGame, forKey: .avgStealsPerGame)
+
         try container.encode(isPublic, forKey: .isPublic)
         try container.encode(isActive, forKey: .isActive)
         try container.encodeIfPresent(currentTeamId, forKey: .currentTeamId)
-        
-        // Encode Double as String (matches decode logic)
-        try container.encode(String(format: "%.2f", marketValue), forKey: .marketValue)
-        
+
+        try container.encode(marketValue, forKey: .marketValue)
+
         try container.encode(isFreeAgent, forKey: .isFreeAgent)
         try container.encodeIfPresent(lastLogin, forKey: .lastLogin)
         try container.encodeIfPresent(createdAt, forKey: .createdAt)
         try container.encodeIfPresent(updatedAt, forKey: .updatedAt)
-        
+
         try container.encodeIfPresent(team, forKey: .team)
     }
 }
@@ -271,8 +290,6 @@ extension Player {
             email: "lebron@lakers.com",
             fullName: "LeBron James",
             bio: "King James. Living legend of basketball.",
-            // IMPORTANT: For previews, ensure this URL is directly usable by URL(string:)
-            // It should NOT have the extra quotes from the raw API response.
             profilePictureUrl: "https://isainrodriguez.com/me/images/courtclan/cc.jpeg",
             location: "Los Angeles, CA",
             dateOfBirth: Date().addingTimeInterval(-39 * 365 * 24 * 60 * 60), // Aproximadamente 39 años
@@ -283,7 +300,7 @@ extension Player {
             totalXp: 99999,
             gamesPlayed: 1400,
             gamesWon: 900,
-            winPercentage: 64.2,
+            winPercentage: 64.2, // Asegúrate de que los datos de muestra sean Double
             avgPointsPerGame: 27.2,
             avgAssistsPerGame: 7.3,
             avgReboundsPerGame: 7.5,
@@ -291,7 +308,7 @@ extension Player {
             avgStealsPerGame: 1.3,
             isPublic: true,
             isActive: true,
-            currentTeamId: UUID().uuidString, // Assign a UUID string
+            currentTeamId: UUID().uuidString,
             marketValue: 50000000.0,
             isFreeAgent: false,
             lastLogin: Date(),

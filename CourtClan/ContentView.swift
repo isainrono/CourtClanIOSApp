@@ -7,12 +7,13 @@
 
 import SwiftUI
 
+
 struct ContentView: View {
     
     @State private var isSplashScreenVisible = true
     @State private var isKeyboarShowing:Bool = false
     @State private var isLoggedIn = false
-
+    
     var body: some View {
         Group {
             if isSplashScreenVisible {
@@ -35,22 +36,25 @@ struct ContentView: View {
                 }
             } else {
                 if isLoggedIn {
-                    TabBarView()
+                    //TabBarView()
+                    ChargeView()
                 } else {
                     
                     Login(onLoginSuccess: {
                         isLoggedIn = true
                     })
-                    .environmentObject(AppData())
-                    .environmentObject(AppUtils())
+                    
                     
                 }
                 
             }
         }
         
+        
     }
 }
+
+
 
 #Preview {
     ContentView()

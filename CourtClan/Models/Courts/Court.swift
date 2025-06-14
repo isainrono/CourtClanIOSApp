@@ -22,8 +22,7 @@ struct Court: Identifiable, Codable {
     let hasNet: Bool // Mapea a 'has_net'
     let hasLights: Bool // Mapea a 'has_lights'
     let availabilityNotes: String // Mapea a 'availability_notes'
-    // `created_at` y `updated_at` se pueden añadir si los necesitas, pero no son esenciales para la vista
-    // `court_type` es un objeto anidado, lo decodificaremos en el init
+    let ownerId: String? // Mapea a 'owner_id', ahora es opcional
 
     // Mapeo de claves JSON de snake_case a camelCase de Swift
     enum CodingKeys: String, CodingKey {
@@ -35,12 +34,12 @@ struct Court: Identifiable, Codable {
         case courtTypeId = "court_type_id"
         case description
         case picturesUrls = "pictures_urls"
+        case ownerId = "owner_id"
         case isPublic = "is_public"
         case hasHoop = "has_hoop"
         case hasNet = "has_net"
         case hasLights = "has_lights"
         case availabilityNotes = "availability_notes"
-        // No necesitamos mapear court_type aquí si solo lo leemos en el init
     }
 
     // Custom Decodable initializer para manejar tipos específicos como los URLs y los Int/Bool (0/1)
@@ -54,31 +53,91 @@ struct Court: Identifiable, Codable {
         self.courtTypeId = try container.decode(String.self, forKey: .courtTypeId)
         self.description = try container.decode(String.self, forKey: .description)
         self.availabilityNotes = try container.decode(String.self, forKey: .availabilityNotes)
-
-        // Decodificar los Bool que vienen como Int (0 o 1)
+        self.ownerId = try container.decodeIfPresent(String.self, forKey: .ownerId)
+        
         self.isPublic = try container.decode(Int.self, forKey: .isPublic) == 1
         self.hasHoop = try container.decode(Int.self, forKey: .hasHoop) == 1
         self.hasNet = try container.decode(Int.self, forKey: .hasNet) == 1
         self.hasLights = try container.decode(Int.self, forKey: .hasLights) == 1
 
-        // `pictures_urls` viene como un string JSON, necesitamos decodificarlo por separado
         let picturesUrlsString = try container.decode(String.self, forKey: .picturesUrls)
         guard let picturesData = picturesUrlsString.data(using: .utf8) else {
             throw DecodingError.dataCorruptedError(forKey: .picturesUrls, in: container, debugDescription: "Cannot convert pictures_urls string to Data")
         }
         self.picturesUrls = try JSONDecoder().decode([String].self, from: picturesData)
-
-        // Nota: El objeto `court_type` anidado no se mapea directamente a una propiedad aquí,
-        // ya que la vista solo necesita las propiedades de la cancha principal.
-        // Si necesitas acceder a `court_type.name` en la vista, deberías añadir una propiedad
-        // anidada en el modelo Court, por ejemplo: `let courtType: CourtTypeDetail`.
     }
 
-    // Encodable (si fueras a enviar datos a la API con este modelo)
-    // He eliminado la implementación de `encode` para simplificar,
-    // ya que el JSON de entrada no coincide con los campos del formulario de edición/creación anteriores.
-    // Si necesitas enviar datos con este modelo, deberías reconstruir `encode(to encoder:)`
-    // para que coincida con la estructura que tu API espera para CREAR/ACTUALIZAR.
+    // Conveniencia init para crear instancias de prueba (Previews, Mocks)
+    init(
+        id: String = UUID().uuidString,
+        name: String,
+        address: String,
+        latitude: String,
+        longitude: String,
+        courtTypeId: String = UUID().uuidString,
+        description: String,
+        picturesUrls: [String] = [],
+        isPublic: Bool,
+        hasHoop: Bool,
+        hasNet: Bool,
+        hasLights: Bool,
+        availabilityNotes: String,
+        ownerId: String? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.courtTypeId = courtTypeId
+        self.description = description
+        self.picturesUrls = picturesUrls
+        self.isPublic = isPublic
+        self.hasHoop = hasHoop
+        self.hasNet = hasNet
+        self.hasLights = hasLights
+        self.availabilityNotes = availabilityNotes
+        self.ownerId = ownerId
+    }
 }
 
-
+// MARK: - Extensión para datos de Preview (opcional, pero útil)
+extension Court {
+    static let previewCourt: Court = Court(
+        id: "mock-court-uuid-1",
+        name: "Cancha de Baloncesto Central",
+        address: "Calle Falsa 123, Barcelona",
+        latitude: "41.3851",
+        longitude: "2.1734",
+        courtTypeId: "mock-court-type-uuid-1", // ID de un tipo de cancha ficticio
+        description: "Una cancha céntrica ideal para partidos 3v3. Recientemente renovada.",
+        picturesUrls: [
+            "https://example.com/court1_pic1.jpg",
+            "https://example.com/court1_pic2.jpg"
+        ],
+        isPublic: true,
+        hasHoop: true,
+        hasNet: false,
+        hasLights: true,
+        availabilityNotes: "Abierta de 9:00 a 22:00 todos los días.",
+        ownerId: "mock-owner-uuid-1"
+    )
+    
+    static let anotherPreviewCourt: Court = Court(
+        id: "mock-court-uuid-2",
+        name: "Pista de Pádel El Sol",
+        address: "Avenida Siempre Viva 456, Madrid",
+        latitude: "40.4168",
+        longitude: "-3.7038",
+        courtTypeId: "mock-court-type-uuid-2", // ID de otro tipo de cancha
+        description: "Pista exterior con buen mantenimiento, ideal para dobles.",
+        picturesUrls: [
+            "https://example.com/court2_pic1.jpg"
+        ],
+        isPublic: false,
+        hasHoop: false,
+        hasNet: true,
+        hasLights: false,
+        availabilityNotes: "Reservas necesarias. Cerrado los domingos por la tarde."
+    )
+}

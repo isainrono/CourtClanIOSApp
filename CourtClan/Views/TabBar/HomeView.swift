@@ -175,6 +175,7 @@ struct HomeView: View {
     
     var body: some View {
         NavigationView {
+            
             List {
                 ForEach(userProfiles) { user in
                     UserProfileRow(user: user)
@@ -226,10 +227,17 @@ struct HomeView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
             .fullScreenCover(isPresented: $isProfileActiveFullScreen) {
-                ProfilePageView(isPresented: $isProfileActiveFullScreen)
+                    PlayerManagerView()
+                        .environmentObject(appData)
+                
+                
             }
+            
+            
         }
         
+        
+       
     }
 }
 
