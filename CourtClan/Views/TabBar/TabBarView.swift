@@ -24,7 +24,9 @@ struct TabBarView: View {
             TeamsView().tag(2)
                 .environmentObject(appData)
             
-            HighLightsView().tag(3)
+            /*HighLightsView().tag(3)
+                .environmentObject(appData)*/
+            TeamPlayersView().tag(3)
                 .environmentObject(appData)
             
             CourtsView().tag(4)

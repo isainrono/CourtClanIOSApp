@@ -17,7 +17,7 @@ struct MyTeamsView: View {
     
     var body: some View {
         HStack{
-            Text("My Teams")
+            Text("Mis Equipos")
                 .font(.title2)
                 .fontWeight(.bold)
             Spacer()
@@ -27,10 +27,7 @@ struct MyTeamsView: View {
         VStack{
             
             if team?.name == "" {
-                Text("Not teams yet ... ")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                Spacer()
+                AddTeamButton()
             } else {
                 TeamRowView(team: team!)
             }
@@ -39,6 +36,12 @@ struct MyTeamsView: View {
             
         }
         .padding(.horizontal)
+    }
+}
+
+struct AddTeamButton:View {
+    var body: some View {
+        CustomButtons(text: "Añade un nuevo equipo", backgroundColor: .white, textColor: .black, imageName: "plus")
     }
 }
 

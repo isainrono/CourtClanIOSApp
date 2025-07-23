@@ -1,23 +1,22 @@
 //
-//  MyEventsView.swift
+//  EventGames.swift
 //  CourtClan
 //
-//  Created by Isain Rodriguez Noreña on 11/6/25.
+//  Created by Isain Rodriguez Noreña on 7/7/25.
 //
 
 import SwiftUI
 
-struct MyEventsView: View {
+struct EventGames: View {
     
     @State var showAddGameView: Bool = false
     
     var body: some View {
-        
         VStack(alignment: .center, spacing: 20) {
             
             // MARK: - Sección "My Courts"
             VStack(alignment: .leading, spacing: 20) {
-                Text("Mis Eventos")
+                Text("Mis Partidos")
                     .font(.title2)
                     .fontWeight(.bold)
                 
@@ -32,30 +31,25 @@ struct MyEventsView: View {
                 AddGameButton()
             }
             
+            
         }
         .padding(.horizontal)
-        
-        .fullScreenCover(isPresented: $showAddGameView){
+        .sheet(isPresented: $showAddGameView) {
             if #available(iOS 16.0, *) {
                 /*AddGameView(isShowingSheet: $showAddGameView)
-                 .presentationDetents([.large])
-                 .presentationDragIndicator(.visible)*/
-                EventListView()
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)*/
+                GamesListView(viewModel: GamesViewModel())
+                //GamesPlayerView(viewModel: GamesViewModel())
             } else {
                 //AddGameView(isShowingSheet: $showAddGameView)
-                EventListView()
+                GamesListView(viewModel: GamesViewModel())
+                //GamesPlayerView(viewModel: GamesViewModel())
             }
         }
-        
-    }
-}
-
-struct AddEventButton: View {
-    var body: some View {
-        CustomButtons(text: "Añade un nuevo evento", backgroundColor: .white, textColor: .black, imageName: "plus")
     }
 }
 
 #Preview {
-    MyEventsView()
+    EventGames()
 }

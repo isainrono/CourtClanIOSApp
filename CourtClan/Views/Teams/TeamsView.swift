@@ -11,6 +11,7 @@ struct TeamsView: View {
     // Instancia del ViewModel que observaremos
     @StateObject var viewModel = TeamsViewModel()
     @FocusState private var isSearchBarFocused: Bool
+    @EnvironmentObject var appData: AppData
 
     var body: some View {
         NavigationStack {
@@ -53,6 +54,7 @@ struct TeamsView: View {
                                     }
                                     .tint(.blue)
                                 }
+                                .environmentObject(appData)
                         }
                     }
                     .refreshable { // Pull-to-refresh
@@ -125,9 +127,13 @@ struct TeamsView: View {
 // MARK: - TeamRowView (Vista de una fila de equipo en la lista)
 struct TeamRowView: View {
     let team: Team
+    @EnvironmentObject var appData: AppData
 
     var body: some View {
-        NavigationLink{}label: {
+        NavigationLink{
+            /*TeamProfileView(teamSelected:team)
+                .environmentObject(appData)*/
+        }label: {
             HStack {
                 if let logoUrl = team.logoUrl, let url = URL(string: logoUrl) {
                     AsyncImage(url: url) { image in
@@ -163,7 +169,7 @@ struct TeamRowView: View {
                             .foregroundColor(.gray)
                             .lineLimit(1)
                     }
-                    Text("Fondos: \(team.teamFunds, specifier: "%.2f") €")
+                    Text("Fondos: \(team.teamFunds ?? 100.00, specifier: "%.2f") €")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -254,9 +260,9 @@ struct AddEditTeamView: View {
                     name = team.name
                     description = team.description ?? ""
                     logoUrl = team.logoUrl ?? ""
-                    ownerUserId = team.ownerUserId
+                    ownerUserId = team.ownerUserId ?? ""
                     captainUserId = team.captainUserId ?? ""
-                    teamFunds = String(format: "%.2f", team.teamFunds)
+                    teamFunds = String(format: "%.2f", team.teamFunds ?? 1000)
                 } else {
                     isEditing = false
                     // Aquí, en una app real, ownerUserId podría ser el ID del usuario logueado.

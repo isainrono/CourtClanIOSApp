@@ -19,7 +19,7 @@ struct MyCourtsView: View {
                 
                 // MARK: - Sección "My Courts"
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("My Courts")
+                    Text("Mis Canchas")
                         .font(.title2)
                         .fontWeight(.bold)
 
@@ -63,6 +63,13 @@ struct MyCourtsView: View {
                 // ... tus ToolbarItems ...
             }
          // Fin de NavigationView
+    }
+}
+
+struct AddCourtButton: View {
+    var body: some View {
+        CustomButtons(text: "Añade una nueva cancha", backgroundColor: .white, textColor: .black, imageName: "plus")
+        
     }
 }
 

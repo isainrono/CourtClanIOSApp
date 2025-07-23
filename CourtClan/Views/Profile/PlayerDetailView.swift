@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PlayerDetailView: View {
     let player: Player
+    // Propiedades de ejemplo, si no las obtienes de `player`
     let playerName: String = ""
     let position: String = ""
     let team: String = ""
@@ -29,92 +30,13 @@ struct PlayerDetailView: View {
         Double(draws) / Double(totalGames)
     }
     
-   
+    // --- NUEVO: Estado para la animación de rotación ---
+    @State private var rotationAngle: Angle = .degrees(90)
     
     var body: some View {
-        
-        
-        /*List {
-         Section {
-         ZStack(alignment: .topLeading) {
-         image
-         .resizable()
-         .scaledToFill()
-         .frame(maxWidth: .infinity, maxHeight: 320)
-         .clipped()
-         
-         HStack (alignment: .center){
-         Text("NBA PLAYOFFS")
-         .font(.caption2)
-         .fontWeight(.bold)
-         .foregroundColor(.white)
-         .padding(8)
-         .background(Color.red.opacity(0.8))
-         .cornerRadius(5)
-         
-         }
-         .padding(.horizontal)
-         .padding(.top)
-         
-         }
-         HStack {
-         VStack(alignment: .center) {
-         Text("\(place)")
-         .font(.largeTitle)
-         .fontWeight(.bold)
-         .foregroundColor(.white)
-         Text("PLACE")
-         .font(.caption)
-         .foregroundColor(.gray)
-         }
-         .frame(width: 80)
-         Divider()
-         .frame(height: 30)
-         .background(Color.gray)
-         VStack(alignment: .leading) {
-         Text(playerName.uppercased())
-         .font(.headline)
-         .fontWeight(.bold)
-         .foregroundColor(.white)
-         Text("\(position.uppercased()) | \(team.uppercased())")
-         .font(.caption)
-         .foregroundColor(.gray)
-         }
-         Spacer()
-         Image(systemName: "plus.circle.fill")
-         .font(.largeTitle)
-         .foregroundColor(Color(red: 118/255, green: 215/255, blue: 194/255))
-         .padding(.trailing)
-         }
-         .padding()
-         .background(Color(white: 0, opacity: 0.2))
-         }
-         .background(Color(red: 103/255, green: 65/255, blue: 153/255))
-         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) // 2 points bottom
-         .listSectionSeparator(.hidden)
-         
-         
-         Section(header: Text("Statistics")){
-         // Stats Grid
-         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-         StatItem(value: "\(minutes)", label: "MINUTES")
-         StatItem(value: "\(points)", label: "POINTS")
-         StatItem(value: String(format: "%.0f", fgPercentage) + "%", label: "FG%")
-         StatItem(value: "\(rebounds)", label: "REBOUNDS")
-         StatItem(value: String(format: "%.1f", assists), label: "ASSISTS")
-         StatItem(value: String(format: "%.1f", steals), label: "STEALS")
-         }
-         .padding()
-         .background(Color(red: 103/255, green: 65/255, blue: 153/255))
-         .cornerRadius(10)
-         
-         }
-         .listRowInsets(EdgeInsets(top: 2, leading: 0, bottom: 0, trailing: 0)) // 2 points top
-         .listSectionSeparator(.hidden)
-         }
-         .navigationTitle(playerName)*/
-        ScrollView {
+        VStack {
             VStack(spacing: 0) { // Added VStack to stack the elements vertically
+                
                 ZStack(alignment: .topLeading) {
                     if let profileUrl = player.profilePictureUrl, let url = URL(string: profileUrl) {
                         AsyncImage(url: url) { image in
@@ -141,6 +63,23 @@ struct PlayerDetailView: View {
                             .padding(.trailing, 5)
                     }
                     
+                    // --- AÑADE ESTE CÓDIGO PARA EL DEGRADADO ---
+                    Rectangle() // Un rectángulo para aplicar el degradado
+                        .fill(LinearGradient(gradient: Gradient(colors: [.clear,.clear, Color(red: 103/255, green: 65/255, blue: 153/255)]),
+                                             startPoint: .top,
+                                             endPoint: .bottom)) // Ajusta endPoint a .center o .top según necesites
+                        .frame(maxWidth: .infinity, maxHeight: 220) // Mismo tamaño que la imagen
+                        .clipped() // Asegura que el degradado también se corte al mismo tamaño
+                    // --- FIN DEL CÓDIGO DEL DEGRADADO ---
+                    
+                    HStack(alignment: .center) {
+                        Spacer()
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.white.opacity(0.5))
+                    }
+                    .padding(.horizontal)
+                    
                     HStack(alignment: .center) {
                         Text("RODMON PLAYER")
                             .font(.caption2)
@@ -153,6 +92,7 @@ struct PlayerDetailView: View {
                     .padding(.horizontal)
                     .padding(.top)
                 }
+                .padding(.top, 20)
                 
                 HStack {
                     VStack(alignment: .center) {
@@ -185,17 +125,13 @@ struct PlayerDetailView: View {
                         .padding(.trailing)
                 }
                 .padding()
-                //.background(Color(white: 0, opacity: 0.2))
                 .background(Color(red: 103/255, green: 65/255, blue: 153/255))
                 
-                VStack(spacing: 20) { // Añadimos un espaciado entre el botón y los Spacers
-                    // Empuja el botón hacia el centro verticalmente
-                    
+                VStack(spacing: 20) {
                     Button {
-                        // Acción del botón
                         print("Botón '1 VS 1' presionado")
                     } label: {
-                        HStack(spacing: 16) { // Espaciado entre los elementos del texto
+                        HStack(spacing: 16) {
                             Text("1")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
@@ -203,67 +139,52 @@ struct PlayerDetailView: View {
                             Text("VS")
                                 .font(.headline)
                                 .fontWeight(.semibold)
-                                .foregroundColor(Color.white.opacity(0.7)) // Color secundario
+                                .foregroundColor(Color.white.opacity(0.7))
                             Text("1")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
                                 .foregroundColor(Color.white.opacity(0.7))
                         }
-                        //.padding(.horizontal, 50) // Añade padding horizontal
-                        .padding(.vertical, 8)   // Añade padding vertical
-                        .frame(maxWidth: .infinity) // Expande horizontalmente dentro del botón
-                        .background(LinearGradient(gradient: Gradient(colors: [
-                            Color(red: 103/255, green: 65/255, blue: 153/255), // Color principal más oscuro
-                            Color(red: 118/255, green: 215/255, blue: 194/255)  // Color de acento más claro
-                        ]), startPoint: .leading, endPoint: .trailing))
-                        .cornerRadius(10) // Bordes más redondeados
-                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2) // Ligera sombra
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity,maxHeight: 40)
+                        .background(Color(red: 118/255, green: 215/255, blue: 194/255))
+                        .cornerRadius(10)
+                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
                     }
-                    .buttonStyle(PlainButtonStyle()) // Elimina el estilo de botón predeterminado para personalizarlo completamente
-                    
+                    .buttonStyle(PlainButtonStyle())
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                //.background(Color(white: 0.1)) // Fondo oscuro para contrastar
-                
-                //.background(Color(white: 0, opacity: 0.2))
+                .padding(.horizontal)
                 .background(Color(red: 103/255, green: 65/255, blue: 153/255))
+                
                 HStack{
-                    
                     Text("Datos")
                         .font(.system(size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     Spacer()
-                    
                 }
                 .padding()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(white: 0, opacity: 0.2))
+                .frame(maxWidth: .infinity)
                 .background(Color(red: 103/255, green: 65/255, blue: 153/255))
-                
                 
                 HStack (spacing: 8){
                     ZStack {
-                        // Background Circle
                         Circle()
                             .fill(Color.gray.opacity(0.2))
                             .frame(maxWidth: 120, maxHeight: 120)
                         
-                        // First color segment (wins)
                         Circle()
                             .trim(from: 0, to: winPercentage)
                             .stroke(Color.green, style: StrokeStyle(lineWidth: 5, dash: [1,0]))
                             .frame(maxWidth: 120, maxHeight: 120)
                             .rotationEffect(.degrees(-90))
                         
-                        // Second color segment (losses)
                         Circle()
                             .trim(from: winPercentage, to: winPercentage + lossPercentage)
                             .stroke(Color.orange, style: StrokeStyle(lineWidth: 5, dash: [1,0]))
                             .frame(maxWidth: 120, maxHeight: 120)
                             .rotationEffect(.degrees(-90))
                         
-                        // Third color segment (draws)
                         Circle()
                             .trim(from: winPercentage + lossPercentage, to: 1)
                             .stroke(Color.white, style: StrokeStyle(lineWidth: 5, dash: [1,0]))
@@ -279,7 +200,7 @@ struct PlayerDetailView: View {
                                 .foregroundColor(.gray)
                         }
                     }
-                    Spacer() // Pushes the following VStack to the right
+                    Spacer()
                     VStack(alignment: .leading) {
                         HStack {
                             Circle()
@@ -289,7 +210,7 @@ struct PlayerDetailView: View {
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
                                 .foregroundColor(.gray)
-                            Spacer() // Pushes the next element to the right
+                            Spacer()
                             Text(wins.description)
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
@@ -308,7 +229,7 @@ struct PlayerDetailView: View {
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
                                 .foregroundColor(.gray)
-                            Spacer() // Pushes the next element to the right
+                            Spacer()
                             Text(losses.description)
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
@@ -327,7 +248,7 @@ struct PlayerDetailView: View {
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
                                 .foregroundColor(.gray)
-                            Spacer() // Pushes the next element to the right
+                            Spacer()
                             Text(draws.description)
                                 .font(.system(size: 20))
                                 .fontWeight(.bold)
@@ -336,8 +257,7 @@ struct PlayerDetailView: View {
                     }
                 }
                 .padding()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(white: 0, opacity: 0.2))
+                .frame(maxWidth: .infinity)
                 .background(Color(red: 103/255, green: 65/255, blue: 153/255))
                 
                 // Stats Grid
@@ -353,29 +273,44 @@ struct PlayerDetailView: View {
                 .background(Color(red: 103/255, green: 65/255, blue: 153/255))
                 
                 Spacer()
-                
-                
-                
-                
             }
             .navigationTitle(playerName)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color(red: 103/255, green: 65/255, blue: 153/255), for: .navigationBar)
-            //.toolbar(.hidden, for: .scrollContent)
-            
-            //.navigationBarBackButtonHidden(true)
-            
         }
-        .background(Color(red: 103/255, green: 65/255, blue: 153/255))
-        
-        
+        // Aplica el fondo a la vista PlayerDetailView
+        // Esto hará que toda la vista tenga este fondo.
+        .background(Color(red: 103/255, green: 65/255, blue: 153/255).ignoresSafeArea()) // Fondo semi-transparente para toda la vista
+        .cornerRadius(20) // Aplica el corner radius a toda la vista
+        .padding(.horizontal, 20) // Mantiene el padding horizontal
+        .padding(.top, 50)
+        .padding(.bottom, 80) // Mantiene el padding inferior
+        .rotation3DEffect(
+            rotationAngle, // Usa la variable de estado
+            axis: (x: 0.0, y: 1.0, z: 0.0), // Gira alrededor del eje Y (de lado a lado)
+            anchor: .center, // Punto central de rotación
+            perspective: 1.0 // Perspectiva para un efecto 3D
+        )
+        // --- NUEVO: Anima la rotación cuando la vista aparece ---
+        .onAppear {
+            // Anima el cambio de rotationAngle de 90 a 0 grados
+            withAnimation(.spring(response: 0.7, dampingFraction: 0.7, blendDuration: 0)) {
+                rotationAngle = .degrees(0) // Llega a su posición final sin rotación
+            }
+        }
+        // Opcional: Animar la rotación inversa al desaparecer (para el descarte)
+        .onDisappear {
+            withAnimation(.spring(response: 0.7, dampingFraction: 0.7, blendDuration: 0)) {
+                rotationAngle = .degrees(90) // Gira de nuevo al irse
+            }
+        }
     }
 }
 
 struct StatItem: View {
     let value: String
     let label: String
-
+    
     var body: some View {
         VStack {
             Text(value)
@@ -426,7 +361,7 @@ struct StatItem: View {
         updatedAt: Date(),
         team: nil // Or a mock Team object if you have one
     )
-
+    
     // Pass the sample player to PlayerDetailView
     PlayerDetailView(player: samplePlayer)
 }

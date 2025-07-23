@@ -23,6 +23,10 @@ struct Court: Identifiable, Codable {
     let hasLights: Bool // Mapea a 'has_lights'
     let availabilityNotes: String // Mapea a 'availability_notes'
     let ownerId: String? // Mapea a 'owner_id', ahora es opcional
+    let createdAt: Date? // <-- MAKE OPTIONAL
+    let updatedAt: Date? // <-- MAKE OPTIONAL
+    var cityAndNeighborhood: String?
+    
 
     // Mapeo de claves JSON de snake_case a camelCase de Swift
     enum CodingKeys: String, CodingKey {
@@ -40,6 +44,30 @@ struct Court: Identifiable, Codable {
         case hasNet = "has_net"
         case hasLights = "has_lights"
         case availabilityNotes = "availability_notes"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+    
+    init(){
+        self.id = "mock-court-uuid-1";
+        self.name = "Cancha de Baloncesto Central";
+        self.address = "Calle Falsa 123, Barcelona";
+        self.latitude = "41.3851";
+        self.longitude = "2.1734";
+        self.courtTypeId = "mock-court-type-uuid-1"; // ID de un tipo de cancha ficticio
+        self.description = "Una cancha céntrica ideal para partidos 3v3. Recientemente renovada.";
+        self.picturesUrls = [
+            "https://example.com/court1_pic1.jpg",
+            "https://example.com/court1_pic2.jpg"
+        ];
+        self.isPublic = true;
+        self.hasHoop = true;
+        self.hasNet = false;
+        self.hasLights = true;
+        self.availabilityNotes = "Abierta de 9:00 a 22:00 todos los días.";
+        self.ownerId = "mock-owner-uuid-1";
+        self.createdAt = Date()
+        self.updatedAt = Date()
     }
 
     // Custom Decodable initializer para manejar tipos específicos como los URLs y los Int/Bool (0/1)
@@ -65,6 +93,9 @@ struct Court: Identifiable, Codable {
             throw DecodingError.dataCorruptedError(forKey: .picturesUrls, in: container, debugDescription: "Cannot convert pictures_urls string to Data")
         }
         self.picturesUrls = try JSONDecoder().decode([String].self, from: picturesData)
+        self.createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) // Decode as optional
+        self.updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) // Decode as optional
+        self.cityAndNeighborhood = nil
     }
 
     // Conveniencia init para crear instancias de prueba (Previews, Mocks)
@@ -82,7 +113,10 @@ struct Court: Identifiable, Codable {
         hasNet: Bool,
         hasLights: Bool,
         availabilityNotes: String,
-        ownerId: String? = nil
+        ownerId: String? = nil,
+        createdAt: Date? = nil,
+        updatedAt: Date? = nil,
+        cityAndNeighborhood: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -98,6 +132,9 @@ struct Court: Identifiable, Codable {
         self.hasLights = hasLights
         self.availabilityNotes = availabilityNotes
         self.ownerId = ownerId
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.cityAndNeighborhood = cityAndNeighborhood
     }
 }
 
@@ -120,7 +157,8 @@ extension Court {
         hasNet: false,
         hasLights: true,
         availabilityNotes: "Abierta de 9:00 a 22:00 todos los días.",
-        ownerId: "mock-owner-uuid-1"
+        ownerId: "mock-owner-uuid-1",
+        cityAndNeighborhood: "Barcelona"
     )
     
     static let anotherPreviewCourt: Court = Court(
@@ -138,6 +176,7 @@ extension Court {
         hasHoop: false,
         hasNet: true,
         hasLights: false,
-        availabilityNotes: "Reservas necesarias. Cerrado los domingos por la tarde."
+        availabilityNotes: "Reservas necesarias. Cerrado los domingos por la tarde.",
+        cityAndNeighborhood: "Barcelona"
     )
 }

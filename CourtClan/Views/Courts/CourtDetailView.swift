@@ -27,55 +27,29 @@ struct CourtDetailView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    // --- Sección de Imágenes (Carrusel) ---
-                    if !court.picturesUrls.isEmpty {
-                        TabView {
-                            ForEach(court.picturesUrls, id: \.self) { urlString in
-                                AsyncImage(url: URL(string: urlString)) { phase in
-                                    switch phase {
-                                    case .empty:
-                                        ProgressView()
-                                            .frame(height: 250)
-                                            .frame(maxWidth: .infinity)
-                                            .background(Color.gray.opacity(0.1))
-                                            .cornerRadius(15)
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    case .failure:
-                                        Image(systemName: "photo.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 150)
-                                            .foregroundColor(.gray)
-                                            .frame(maxWidth: .infinity)
-                                            .background(Color.gray.opacity(0.1))
-                                            .cornerRadius(15)
-                                    @unknown default:
-                                        EmptyView()
-                                    }
-                                }
-                                .clipped()
+                    // --- Sección del Mapa ---
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Ubicación", systemImage: "map.fill")
+                            .font(.headline)
+                            .foregroundColor(.brown)
+                        
+                        if let coordinate = coordinate {
+                            Map(initialPosition: .region(MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)))) {
+                                Marker(court.name, coordinate: coordinate)
                             }
-                        }
-                        .tabViewStyle(.page(indexDisplayMode: .always))
-                        .frame(height: 250)
-                        .cornerRadius(20)
-                        .shadow(radius: 5)
-                        .padding(.horizontal)
-                    } else {
-                        // Placeholder si no hay imágenes
-                        Image(systemName: "sportscourt.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 150)
-                            .foregroundColor(.gray.opacity(0.6))
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.1))
+                            .frame(height: 250)
                             .cornerRadius(20)
-                            .padding(.horizontal)
+                            .shadow(radius: 5)
+                        } else {
+                            Text("Ubicación no disponible.")
+                                .foregroundColor(.red)
+                        }
                     }
+                    .padding(.horizontal)
+
+                    Spacer()
+                    
+                    
 
                     // --- Información Principal ---
                     VStack(alignment: .leading, spacing: 8) {
@@ -139,27 +113,57 @@ struct CourtDetailView: View {
                     }
                     .padding(.horizontal)
                     
-                    // --- Sección del Mapa ---
-                    VStack(alignment: .leading, spacing: 8) {
-                        Label("Ubicación", systemImage: "map.fill")
-                            .font(.headline)
-                            .foregroundColor(.brown)
-                        
-                        if let coordinate = coordinate {
-                            Map(initialPosition: .region(MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)))) {
-                                Marker(court.name, coordinate: coordinate)
+                    // --- Sección de Imágenes (Carrusel) ---
+                    if !court.picturesUrls.isEmpty {
+                        TabView {
+                            ForEach(court.picturesUrls, id: \.self) { urlString in
+                                AsyncImage(url: URL(string: urlString)) { phase in
+                                    switch phase {
+                                    case .empty:
+                                        ProgressView()
+                                            .frame(height: 250)
+                                            .frame(maxWidth: .infinity)
+                                            .background(Color.gray.opacity(0.1))
+                                            .cornerRadius(15)
+                                    case .success(let image):
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                    case .failure:
+                                        Image(systemName: "photo.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 150)
+                                            .foregroundColor(.gray)
+                                            .frame(maxWidth: .infinity)
+                                            .background(Color.gray.opacity(0.1))
+                                            .cornerRadius(15)
+                                    @unknown default:
+                                        EmptyView()
+                                    }
+                                }
+                                .clipped()
                             }
-                            .frame(height: 250)
-                            .cornerRadius(20)
-                            .shadow(radius: 5)
-                        } else {
-                            Text("Ubicación no disponible.")
-                                .foregroundColor(.red)
                         }
+                        .tabViewStyle(.page(indexDisplayMode: .always))
+                        .frame(height: 250)
+                        .cornerRadius(20)
+                        .shadow(radius: 5)
+                        .padding(.horizontal)
+                    } else {
+                        // Placeholder si no hay imágenes
+                        Image(systemName: "sportscourt.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 150)
+                            .foregroundColor(.gray.opacity(0.6))
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(20)
+                            .padding(.horizontal)
                     }
-                    .padding(.horizontal)
-
-                    Spacer()
+                    
+                    
                 }
                 .padding(.vertical)
             }

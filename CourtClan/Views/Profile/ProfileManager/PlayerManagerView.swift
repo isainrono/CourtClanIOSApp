@@ -29,8 +29,9 @@ struct PlayerManagerView: View {
                         HeaderProfile(player: player)
                         TootleHomeView(player: player)
                         StatisticsView(win: player.gamesWon, loss: player.gamesPlayed-player.gamesWon, draw: 0)
-                        MyEventsView()
+                        MyGamesView()
                         MyTeamsView(team: player.team ?? Team())
+                        MyEventsView()
                         MyCourtsView()
                         MyMerchans()
                         

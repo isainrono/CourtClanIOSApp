@@ -175,7 +175,7 @@ struct TootleHomeView: View {
         
         // Luego puedes modificar el primer elemento de activities
         self.activities[0].description = self.player.preferredPosition!
-        self.activities[1].description = String(self.player.currentLevel)
+        self.activities[1].description = String(self.player.currentLevel ?? 0)
         self.activities[2].description = String(self.player.totalXp)
         self.activities[3].description = self.player.team?.name ?? "FREE"
     }
