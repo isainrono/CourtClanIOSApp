@@ -78,7 +78,17 @@ class AuthenticationView: ObservableObject {
             print("Access Token (parcial): \(accessToken.tokenString.prefix(30))...")
             print("Scopes Otorgados: \(gUser.grantedScopes?.joined(separator: ", ") ?? "Ninguno")")
             print("---------------------------------------------------\n")
-
+            
+            // Por el momento
+            let playerId = "aac386f1-26bc-4cc5-9d90-8513581bb546"
+            UserDefaults.standard.set(playerId, forKey: "playerid")
+            if let savedPlayerId = UserDefaults.standard.string(forKey: "playerid") {
+                print("El playerId guardado es: \(savedPlayerId)")
+            } else {
+                print("No se encontró ningún playerId guardado.")
+            }
+            // Por el momento
+            
             let credential = GoogleAuthProvider.credential(withIDToken: idToken.tokenString, accessToken: accessToken.tokenString)
 
             Auth.auth().signIn(with: credential) { [weak self] firebaseAuthResult, firebaseError in

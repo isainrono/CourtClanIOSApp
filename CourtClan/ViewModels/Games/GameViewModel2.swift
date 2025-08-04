@@ -15,6 +15,7 @@ class GamesViewModel2: ObservableObject {
     @Published var errorMessage: String?
 
     private let service = GameService2.shared
+    
 
     func loadAllGames() {
         isLoading = true

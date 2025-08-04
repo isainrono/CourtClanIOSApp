@@ -40,6 +40,9 @@ class GameService2 {
             }
         }.resume()
     }
+    
+    
+    
 
     func fetchGamesByType(_ type: GameType, completion: @escaping (Result<[Game2], Error>) -> Void) {
         let url = URL(string: "\(baseURL)?game_type=\(type.rawValue)")!

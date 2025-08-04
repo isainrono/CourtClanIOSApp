@@ -43,3 +43,47 @@ struct TeamWithPlayersSimple {
     let team: Team2
     let players: [SimplePlayer]
 }
+
+extension Team2 {
+    static let mockTeams: [Team2] = [
+        Team2(
+            id: "team001",
+            name: "Thunderbolts",
+            description: "Equipo competitivo de la liga urbana",
+            logoURL: nil,
+            captainPlayerId: "player001",
+            ownerPlayerId: "player002",
+            teamFunds: "1500",
+            createdAt: "2025-06-01T12:00:00Z",
+            updatedAt: "2025-07-01T12:00:00Z",
+            players: nil,
+            teamMembers: nil
+        ),
+        Team2(
+            id: "team002",
+            name: "SkyHawks",
+            description: "Orgullo de la zona norte",
+            logoURL: "https://example.com/logo2.png",
+            captainPlayerId: "player003",
+            ownerPlayerId: "player004",
+            teamFunds: "980",
+            createdAt: "2025-05-15T10:30:00Z",
+            updatedAt: "2025-06-20T09:45:00Z",
+            players: nil,
+            teamMembers: nil
+        ),
+        Team2(
+            id: "team003",
+            name: "Rim Warriors",
+            description: "Jugamos con pasión",
+            logoURL: "https://example.com/logo3.png",
+            captainPlayerId: "player005",
+            ownerPlayerId: "player006",
+            teamFunds: "2030",
+            createdAt: "2025-04-10T08:00:00Z",
+            updatedAt: "2025-07-10T11:15:00Z",
+            players: nil,
+            teamMembers: nil
+        )
+    ]
+}

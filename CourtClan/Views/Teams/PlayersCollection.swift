@@ -25,7 +25,7 @@ struct PlayersCollection: View {
     let viewModel = PlayersViewModel()
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("Jugadores")
                 .font(.title2)
                 .fontWeight(.bold)
@@ -55,6 +55,8 @@ struct PlayersCollection: View {
                 }
                 .frame(height: 220)
             }
+            
+          
         }
         .task {
             await loadFullPlayers()
@@ -62,6 +64,9 @@ struct PlayersCollection: View {
         .sheet(isPresented: $showDetail) {
             if let selected = selectedPlayer {
                 PlayerDetailView(player: selected)
+                    .presentationDetents([.fraction(0.99)])
+                    //.presentationDragIndicator(.visible)
+                    .presentationBackground(.clear)
             }
         }
     }

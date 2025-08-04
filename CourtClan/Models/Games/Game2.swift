@@ -23,7 +23,11 @@ enum GameStatus: String, Codable {
 
 
 // MARK: - Modelo Game2 principal
-struct Game2: Codable, Identifiable {
+struct Game2: Codable, Identifiable, Equatable {
+    static func == (lhs: Game2, rhs: Game2) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
     let id: String
     let date: Date
     let startTime: Date

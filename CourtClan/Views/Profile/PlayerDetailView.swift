@@ -6,17 +6,17 @@ struct PlayerDetailView: View {
     let playerName: String = ""
     let position: String = ""
     let team: String = ""
-    let place: Int = 5
-    let minutes: Int = 5
-    let points: Int = 5
-    let fgPercentage: Double = 0.5
-    let rebounds: Int = 5
-    let assists: Double = 0.5
-    let steals: Double = 0.5
+    let place: Int = 0
+    let minutes: Int = 0
+    let points: Int = 0
+    let fgPercentage: Double = 0
+    let rebounds: Int = 0
+    let assists: Double = 0
+    let steals: Double = 0
     let image: Image = Image("hanny")
-    let wins: Int = 49
-    let losses: Int = 5
-    let draws: Int = 10
+    let wins: Int = 0
+    let losses: Int = 0
+    let draws: Int = 0
     var totalGames: Int {
         wins + losses + draws
     }
@@ -81,7 +81,7 @@ struct PlayerDetailView: View {
                     .padding(.horizontal)
                     
                     HStack(alignment: .center) {
-                        Text("RODMON PLAYER")
+                        Text("COURTCLAN PLAYER")
                             .font(.caption2)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
@@ -100,7 +100,7 @@ struct PlayerDetailView: View {
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                        Text("PLACE")
+                        Text("DORSAL")
                             .font(.caption)
                             .foregroundColor(.gray)
                     }

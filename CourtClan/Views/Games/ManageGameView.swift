@@ -420,7 +420,7 @@ struct PlayerButtonView: View {
                     Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 90, height: 90) // Ajustado para un tamaño redondo
+                        .frame(width: 120, height: 120) // Ajustado para un tamaño redondo
                         .clipShape(Circle())
                         .overlay(
                             Circle()
@@ -430,7 +430,7 @@ struct PlayerButtonView: View {
                 } else {
                     Circle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(width: 90, height: 90)
+                        .frame(width: 120, height: 120)
                         .overlay(ProgressView())
                         .overlay(
                             Circle()
@@ -438,12 +438,12 @@ struct PlayerButtonView: View {
                         )
                 }
                 
-                Text(name)
+                /*Text(name)
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.7)*/
             }
             .padding(10)
             .background(isSelected ? Color.blue.opacity(0.1) : Color.clear)

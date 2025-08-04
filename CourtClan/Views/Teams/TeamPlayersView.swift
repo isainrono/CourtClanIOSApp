@@ -26,6 +26,7 @@ struct TeamPlayersView: View {
                 } else {
                     List(viewModel.teams) { team in
                         Button {
+                            viewModel.teamPlayers = []
                             teamSelected = team
                         } label: {
                             Text(team.name)
@@ -56,13 +57,14 @@ struct TeamDetailView: View {
     @ObservedObject var viewModel: TeamViewModel2
     @State private var captain: Player?
     @EnvironmentObject var playerViewModel: PlayersViewModel
+    @State var showGames: Bool = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 
                 // Encabezado con imagen y nombre
-                VStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 16) {
                     if let logoUrl = team.logoURL, let url = URL(string: logoUrl) {
                         AsyncImage(url: url) { image in
                             image
@@ -88,16 +90,14 @@ struct TeamDetailView: View {
                             .shadow(radius: 6)
                     }
 
+                    
+
                     VStack(alignment: .leading) {
                         Text(team.name)
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .foregroundStyle(LinearGradient(
-                                colors: [.blue, .purple],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            ))
-                        Text("ID equipo: \(team.id)")
+                            
+                        Text("\(team.description)")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -126,6 +126,12 @@ struct TeamDetailView: View {
                         PlayersCollection(simplePlayers: viewModel.teamPlayers)
                     }
                 }
+                
+                Button{
+                    showGames = true
+                }label: {
+                    Text("Ver partidos")
+                }
 
             }
             .padding()
@@ -138,11 +144,22 @@ struct TeamDetailView: View {
         .task {
             await viewModel.loadPlayers(for: team.id)
         }
+        .sheet(isPresented: $showGames){
+            TeamGamesView()
+        }
     }
 
 }
 
+#Preview {
 
+
+    let mockViewModel = TeamViewModel2()
+   
+
+    TeamDetailView(team: Team2.mockTeams[0], viewModel: mockViewModel)
+        .environmentObject(PlayersViewModel())
+}
 
 /*
 

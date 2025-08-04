@@ -17,7 +17,11 @@ struct TabBarView: View {
         
         TabView (selection: $tabSelection){
             
-            HomeView()
+            /*HomeView()
+                .environmentObject(appData)
+                .tag(1)*/
+            
+            GameListView3()
                 .environmentObject(appData)
                 .tag(1)
             
